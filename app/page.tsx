@@ -162,6 +162,12 @@ export default function Home() {
               >
                 📊 Todos
               </button>
+              <button
+                onClick={() => setActiveTab('probability')}
+                className={`tab ${activeTab === 'probability' ? 'active' : ''}`}
+              >
+                🎲 Prestigio 3
+              </button>
             </div>
 
             {activeTab === 'recommendations' && (
@@ -249,6 +255,76 @@ export default function Home() {
                     ))}
                   </tbody>
                 </table>
+              </div>
+            )}
+
+            {activeTab === 'probability' && (
+              <div className="brawlers-grid">
+                {analysis.allBrawlers
+                  .filter(
+                    (b) =>
+                      b.probabilityTo4k !== undefined &&
+                      b.probabilityTo4k > 0
+                  )
+                  .sort((a, b) => (b.probabilityTo4k || 0) - (a.probabilityTo4k || 0))
+                  .map((b) => (
+                    <div key={b.id} className="brawler-card">
+                      <div className="brawler-header">
+                        <h3>{b.name}</h3>
+                        <span className="level">⭐ {b.power}</span>
+                      </div>
+                      <div className="brawler-stats">
+                        <p>
+                          <strong>Troféus Atuais:</strong> {b.trophies}
+                        </p>
+                        <p>
+                          <strong>Meta:</strong> 4.000 (Prestigio 3)
+                        </p>
+                        <p>
+                          <strong>Win Rate:</strong>{' '}
+                          {(b.winRate || 50).toFixed(1)}%
+                        </p>
+                        <p>
+                          <strong>Probabilidade:</strong>{' '}
+                          <span
+                            style={{
+                              color:
+                                (b.probabilityTo4k || 0) > 70
+                                  ? '#4ade80'
+                                  : (b.probabilityTo4k || 0) > 40
+                                    ? '#fbbf24'
+                                    : '#ef4444',
+                              fontWeight: 'bold',
+                            }}
+                          >
+                            {(b.probabilityTo4k || 0).toFixed(1)}%
+                          </span>
+                        </p>
+                        <p>
+                          <strong>Tempo Estimado:</strong>{' '}
+                          {(b.estimatedDaysTo4k || 0).toFixed(0)} dias
+                        </p>
+                      </div>
+                      <div className="progress-bar">
+                        <div
+                          className="progress"
+                          style={{
+                            width: `${Math.min(
+                              100,
+                              (b.trophies / 4000) * 100
+                            )}%`,
+                          }}
+                        ></div>
+                      </div>
+                      <p className="recommendation">
+                        {(b.probabilityTo4k || 0) > 70
+                          ? '✅ Alta chance de sucesso'
+                          : (b.probabilityTo4k || 0) > 40
+                            ? '⚠️ Chance moderada'
+                            : '❌ Chance baixa - Pode ser desafiador'}
+                      </p>
+                    </div>
+                  ))}
               </div>
             )}
           </div>
