@@ -13,6 +13,14 @@ export interface AnalyzedBrawler {
   recommendation: string;
 }
 
+export interface BrawlerProbability {
+  name: string;
+  winRate: number;
+  matchesPlayed: number;
+  successProbability: number;
+  estimatedDaysTo3000: number;
+}
+
 export interface Analysis {
   player: {
     name: string;
@@ -25,6 +33,10 @@ export interface Analysis {
     byPotentialGain: AnalyzedBrawler[];
     byEfficiency: AnalyzedBrawler[];
     needsAttention: AnalyzedBrawler[];
+  };
+  probabilityAnalysis?: {
+    bestBrawlers: BrawlerProbability[];
+    overallSuccessProbability: number;
   };
 }
 
@@ -132,5 +144,36 @@ export function analyzeBrawlers(playerData: PlayerProfile): Analysis {
       byEfficiency: topEfficient,
       needsAttention,
     },
+  };
+}
+
+export function calculateSuccessProbability(
+  winRate: number,
+  currentTrophies: number,
+  targetTrophies: number,
+  avgTrophiesPerWin: number = 8
+): {
+  probability: number;
+  estimatedMatches: number;
+  estimatedDays: number;
+} {
+  if (currentTrophies >= targetTrophies) {
+    return { probability: 100, estimatedMatches: 0, estimatedDays: 0 };
+  }
+
+  const trophiesNeeded = targetTrophies - currentTrophies;
+  const estimatedMatches = Math.ceil(trophiesNeeded / avgTrophiesPerWin);
+
+  // Fórmula binomial simplificada para probabilidade
+  // P(sucesso) = winRate^n onde n é proporcional ao progresso
+  const probability = Math.pow(winRate / 100, Math.min(estimatedMatches / 50, 1)) * 100;
+
+  // Estimativa: 20 matches por dia em média
+  const estimatedDays = estimatedMatches / 20;
+
+  return {
+    probability: Math.max(0, Math.min(100, probability)),
+    estimatedMatches,
+    estimatedDays,
   };
 }
