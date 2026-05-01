@@ -194,29 +194,37 @@ export function calculateWinRateByBrawler(
   battleLog: BattleLog,
   brawlers: BrawlerData[]
 ): WinRateByBrawler[] {
-  // Contar vitórias por brawler
-  const brawlerStats = new Map<number, { wins: number; losses: number }>();
-
-  battleLog.items?.forEach((battle) => {
-    // Aqui seria necessário ter informações do brawler usado em cada battle
-    // Como a API pode não retornar isso claramente, usaremos uma estimativa
-    const result = battle.battle?.result || 'draw';
-    // Nota: sem ID do brawler no battlelog, fazemos uma estimativa geral
-  });
-
-  // Calcular win rate geral como fallback
+  // Calcular win rate geral
   const totalMatches = battleLog.items?.length || 0;
   const totalWins = battleLog.items?.filter(
     (b) => b.battle?.result === 'victory'
   ).length || 0;
   const overallWinRate = totalMatches > 0 ? (totalWins / totalMatches) * 100 : 50;
 
-  // Mapear para cada brawler
+  // Encontrar troféus máximo para normalizar
+  const maxTrophies = Math.max(...brawlers.map(b => b.trophies), 1000);
+
+  // Mapear para cada brawler com estimativa baseada em progresso
   return brawlers.map((brawler) => {
+    // Estimar win rate por brawler baseado em:
+    // 1. Win rate geral
+    // 2. Progresso relativo do brawler (troféus normalizados)
+    // 3. Power level (quanto mais alto, mais ganho)
+
+    const trophyProgression = (brawler.trophies / maxTrophies) * 10; // 0-10 bonus
+    const powerBonus = (brawler.power / 11) * 10; // 0-10 bonus
+    const baseWinRate = overallWinRate;
+
+    // Win rate ajustado: base + bonos normalizados
+    const adjustedWinRate = Math.min(
+      95,
+      baseWinRate + (trophyProgression + powerBonus) / 4
+    );
+
     const targetTrophies = 4000; // Prestigio 3
     const currentTrophies = brawler.trophies;
     const { probability, estimatedDays } = calculateSuccessProbability(
-      overallWinRate,
+      adjustedWinRate,
       currentTrophies,
       targetTrophies,
       8
@@ -225,7 +233,7 @@ export function calculateWinRateByBrawler(
     return {
       brawlerId: brawler.id,
       brawlerName: brawler.name,
-      winRate: overallWinRate,
+      winRate: Math.max(30, adjustedWinRate), // Mínimo 30%
       matchesPlayed: totalMatches,
       probabilityTo4k: probability,
       estimatedDaysTo4k: estimatedDays,

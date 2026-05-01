@@ -15,7 +15,8 @@
       "Bash(pkill -f \"npm run dev\")",
       "Bash(curl -s http://localhost:3000)",
       "Bash(curl -s -I http://localhost:3000)",
-      "Bash(git commit -m 'feat: add Prestigio 3 probability tab with visual analysis *)"
+      "Bash(git commit -m 'feat: add Prestigio 3 probability tab with visual analysis *)",
+      "Bash(git commit -m 'improve: calculate individual brawler win rates based on progression *)"
     ]
   }
 }
