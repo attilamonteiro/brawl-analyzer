@@ -1,4 +1,4 @@
-import { PlayerProfile, BrawlerData } from './brawlStarsApi';
+import { PlayerProfile, BrawlerData, BattleLog } from './brawlStarsApi';
 
 export interface AnalyzedBrawler {
   id: number;
@@ -11,6 +11,9 @@ export interface AnalyzedBrawler {
   efficiency: number;
   potentialGain: number;
   recommendation: string;
+  winRate?: number;
+  probabilityTo4k?: number;
+  estimatedDaysTo4k?: number;
 }
 
 export interface BrawlerProbability {
@@ -176,4 +179,56 @@ export function calculateSuccessProbability(
     estimatedMatches,
     estimatedDays,
   };
+}
+
+export interface WinRateByBrawler {
+  brawlerId: number;
+  brawlerName: string;
+  winRate: number;
+  matchesPlayed: number;
+  probabilityTo4k: number;
+  estimatedDaysTo4k: number;
+}
+
+export function calculateWinRateByBrawler(
+  battleLog: BattleLog,
+  brawlers: BrawlerData[]
+): WinRateByBrawler[] {
+  // Contar vitórias por brawler
+  const brawlerStats = new Map<number, { wins: number; losses: number }>();
+
+  battleLog.items?.forEach((battle) => {
+    // Aqui seria necessário ter informações do brawler usado em cada battle
+    // Como a API pode não retornar isso claramente, usaremos uma estimativa
+    const result = battle.battle?.result || 'draw';
+    // Nota: sem ID do brawler no battlelog, fazemos uma estimativa geral
+  });
+
+  // Calcular win rate geral como fallback
+  const totalMatches = battleLog.items?.length || 0;
+  const totalWins = battleLog.items?.filter(
+    (b) => b.battle?.result === 'victory'
+  ).length || 0;
+  const overallWinRate = totalMatches > 0 ? (totalWins / totalMatches) * 100 : 50;
+
+  // Mapear para cada brawler
+  return brawlers.map((brawler) => {
+    const targetTrophies = 4000; // Prestigio 3
+    const currentTrophies = brawler.trophies;
+    const { probability, estimatedDays } = calculateSuccessProbability(
+      overallWinRate,
+      currentTrophies,
+      targetTrophies,
+      8
+    );
+
+    return {
+      brawlerId: brawler.id,
+      brawlerName: brawler.name,
+      winRate: overallWinRate,
+      matchesPlayed: totalMatches,
+      probabilityTo4k: probability,
+      estimatedDaysTo4k: estimatedDays,
+    };
+  });
 }

@@ -10,7 +10,8 @@
       "Bash(git remote *)",
       "Bash(git branch *)",
       "Bash(git push *)",
-      "Bash(git commit -m 'feat: add battle log API and probability success calculation *)"
+      "Bash(git commit -m 'feat: add battle log API and probability success calculation *)",
+      "Bash(git commit -m 'feat: add win rate calculation and Prestigio 3 probability analysis *)"
     ]
   }
 }
