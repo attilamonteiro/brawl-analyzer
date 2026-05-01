@@ -2,7 +2,14 @@
   "permissions": {
     "allow": [
       "Bash(git add *)",
-      "Bash(git commit -m 'Rewrite: Next.js fullstack application *)"
+      "Bash(git commit -m 'Rewrite: Next.js fullstack application *)",
+      "Bash(npm install *)",
+      "Bash(npm run *)",
+      "Bash(curl -s \"http://localhost:3000/api/analysis?tag=%23test\")",
+      "Bash(nslookup contently-tinsel-landline.ngrok-free.dev 8.8.8.8)",
+      "Bash(git remote *)",
+      "Bash(git branch *)",
+      "Bash(git push *)"
     ]
   }
 }

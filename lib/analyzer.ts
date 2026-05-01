@@ -60,7 +60,6 @@ function findBracket(
 
 function getRecommendation(
   brawler: BrawlerData,
-  bracket: { min: number; max: number; avgPerLevel: number },
   efficiency: number
 ): string {
   if (brawler.power < 9) {
@@ -103,7 +102,7 @@ export function analyzeBrawlers(playerData: PlayerProfile): Analysis {
       progress: Math.min(progress, 100),
       efficiency,
       potentialGain: Math.max(0, bracket.max - brawler.trophies),
-      recommendation: getRecommendation(brawler, bracket, efficiency),
+      recommendation: getRecommendation(brawler, efficiency),
     };
   });
 
